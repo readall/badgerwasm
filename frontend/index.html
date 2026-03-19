@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>IoT Metrics Dashboard</title>
+    <script src="wasm_exec.js"></script>
+</head>
+<body>
+    <h1>IoT Metrics Dashboard</h1>
+    <div id="output">Loading...</div>
+    <script>
+        // The Go WASM module will be instantiated automatically by wasm_exec.js
+        // We need to fetch and instantiate our frontend.wasm module
+        
+        // Fetch the WASM module
+        fetch('frontend.wasm')
+            .then(response => response.arrayBuffer())
+            .then(bytes => {
+                // Instantiate the WASM module
+                const go = new Go();
+                WebAssembly.instantiate(bytes, go.importObject).then(result => {
+                    go.run(result.instance);
+                });
+            })
+            .catch(err => {
+                console.error('Failed to load WASM module:', err);
+                document.getElementById('output').innerText = 'Error loading application: ' + err.message;
+            });
+            
+        // Function to update UI from Go code
+        window.updateUI = function(message) {
+            document.getElementById('output').innerText = message;
+        };
+    </script>
+</body>
+</html>
