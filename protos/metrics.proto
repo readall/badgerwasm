@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package metrics;
+
+option go_package = "backend/pb";
+
+// The metrics service definition.
+service MetricsService {
+  // Stream of real-time metric updates
+  rpc SubscribeMetrics(SubscriptionRequest) returns (stream MetricUpdate);
+  
+  // Fetch historical metrics
+  rpc GetHistoricalMetrics(HistoricalRequest) returns (stream MetricPoint);
+  
+  // Get available devices
+  rpc GetDevices(DeviceRequest) returns (DeviceList);
+  
+  // Update configuration
+  rpc UpdateConfig(ConfigUpdate) returns (ConfigResponse);
+}
+
+// Request to subscribe to metric updates
+message SubscriptionRequest {
+  repeated string device_ids = 1;
+  repeated string metric_types = 2;
+}
+
+// A single metric update
+message MetricUpdate {
+  string device_id = 1;
+  string metric_name = 2;
+  double value = 3;
+  int64 timestamp = 4; // Unix timestamp in milliseconds
+  map<string, string> tags = 5;
+}
+
+// Request for historical metrics
+message HistoricalRequest {
+  string device_id = 1;
+  string metric_name = 2;
+  int64 start_time = 3; // Unix timestamp in milliseconds
+  int64 end_time = 4;   // Unix timestamp in milliseconds
+}
+
+// A single historical metric point
+message MetricPoint {
+  double value = 1;
+  int64 timestamp = 2; // Unix timestamp in milliseconds
+}
+
+// Request for device list
+message DeviceRequest {
+  // Empty for now, could add filters in future
+}
+
+// List of available devices
+message DeviceList {
+  repeated string device_ids = 1;
+}
+
+// Configuration update
+message ConfigUpdate {
+  string dashboard_id = 1;
+  map<string, string> settings = 2;
+}
+
+// Configuration response
+message ConfigResponse {
+  bool success = 1;
+  string message = 2;
+}
