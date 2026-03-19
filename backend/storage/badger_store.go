@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -49,7 +50,7 @@ func (s *BadgerStore) SaveMetric(ctx context.Context, metric *Metric) error {
 	}
 
 	// Key format: metric:{deviceID}:{metricName}:{timestamp}
-	key := []byte("metric:" + metric.DeviceID + ":" + metric.MetricName + ":" + string(metric.Timestamp))
+	key := []byte("metric:" + metric.DeviceID + ":" + metric.MetricName + ":" + strconv.FormatInt(metric.Timestamp, 10))
 
 	// Save to BadgerDB
 	err = s.db.Update(func(txn *badger.Txn) error {
